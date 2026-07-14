@@ -3,43 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000" />
-  <title>Studio Aura</title>
-  <meta name="description" content="Ensaios fotográficos com inteligência artificial." />
+  <meta name="theme-color" content="#14101a" />
+  <title>Como funciona — Studio Aura</title>
 
   <style>
     :root{
-      --black:#000;
-      --white:#fff;
-      --soft:#b5b5b5;
-      --line:rgba(255,255,255,.16);
+      --bg:#14101a;
+      --panel:#21192b;
+      --text:#fff8f2;
+      --muted:#c2b5c8;
+      --gold:#d6b06f;
+      --line:rgba(255,255,255,.12);
       --ease:cubic-bezier(.22,.61,.36,1);
     }
 
-    *{
-      box-sizing:border-box;
-      border-radius:0!important;
-    }
-
-    html{
-      scroll-behavior:smooth;
-      background:#000;
-    }
+    *{box-sizing:border-box}
 
     body{
       margin:0;
-      background:#000;
-      color:#fff;
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
-    }
-
-    button,input{
-      font:inherit;
-    }
-
-    button{
-      color:inherit;
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 80% 20%,rgba(167,109,125,.16),transparent 26%),
+        var(--bg);
+      font-family:Inter,Arial,Helvetica,sans-serif;
     }
 
     a{
@@ -47,625 +34,214 @@
       text-decoration:none;
     }
 
-    .loader{
-      position:fixed;
-      inset:0;
-      z-index:999;
-      display:grid;
-      place-items:center;
-      background:#000;
-      transition:opacity .8s var(--ease), visibility .8s var(--ease);
-    }
-
-    .loader.hidden{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
-    }
-
-    .loader-box{
-      width:min(520px,calc(100vw - 40px));
-    }
-
-    .loader-title{
-      margin:0;
-      font-size:clamp(52px,10vw,120px);
-      line-height:.85;
-      letter-spacing:-.07em;
-      text-transform:uppercase;
-    }
-
-    .loader-line{
-      height:1px;
-      margin-top:36px;
-      background:rgba(255,255,255,.12);
-      overflow:hidden;
-    }
-
-    .loader-progress{
-      width:0;
-      height:100%;
-      background:#fff;
-      transition:width .12s linear;
-    }
-
-    .loader-info{
-      display:flex;
-      justify-content:space-between;
-      margin-top:12px;
-      color:#9b9b9b;
-      font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-    }
-
-    .site{
-      opacity:0;
-      transform:translateY(10px);
-      transition:opacity .8s var(--ease), transform .8s var(--ease);
-    }
-
-    .site.visible{
-      opacity:1;
-      transform:none;
-    }
-
     .header{
-      height:72px;
+      height:76px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding:0 28px;
+      padding:0 34px;
       border-bottom:1px solid var(--line);
-      position:relative;
-      z-index:10;
     }
 
     .logo{
-      font-size:18px;
-      font-weight:800;
-      letter-spacing:-.03em;
-      text-transform:uppercase;
+      font-size:16px;
+      font-weight:700;
+      white-space:nowrap;
     }
 
-    .header-meta{
-      color:#a9a9a9;
-      font-size:9px;
-      letter-spacing:.2em;
+    .back{
+      color:var(--muted);
+      font-size:10px;
+      letter-spacing:.12em;
       text-transform:uppercase;
+      white-space:nowrap;
+      transition:color .25s var(--ease);
     }
 
-    .hero{
-      min-height:calc(100vh - 72px);
+    .back:hover{
+      color:var(--gold);
+    }
+
+    .page{
+      min-height:calc(100vh - 76px);
       display:grid;
-      grid-template-columns:1.05fr .95fr;
-      border-bottom:1px solid var(--line);
+      grid-template-columns:.9fr 1.1fr;
     }
 
-    .hero-copy{
+    .intro{
+      padding:72px 54px;
+      border-right:1px solid var(--line);
       display:flex;
       flex-direction:column;
       justify-content:center;
-      padding:72px 48px;
-      border-right:1px solid var(--line);
     }
 
     .eyebrow{
-      margin-bottom:26px;
-      color:#a8a8a8;
+      margin-bottom:20px;
+      color:var(--gold);
       font-size:10px;
-      letter-spacing:.28em;
+      letter-spacing:.18em;
       text-transform:uppercase;
+      white-space:nowrap;
     }
 
-    .hero-title{
+    h1{
       margin:0;
-      max-width:850px;
-      font-size:clamp(64px,8vw,132px);
-      line-height:.82;
-      letter-spacing:-.075em;
-      text-transform:uppercase;
+      max-width:680px;
+      font-size:clamp(40px,5vw,68px);
+      line-height:1;
+      letter-spacing:-.05em;
+      font-weight:600;
     }
 
-    .hero-text{
-      max-width:520px;
-      margin:34px 0 0;
-      color:#b2b2b2;
+    .intro p{
+      max-width:500px;
+      margin:26px 0 0;
+      color:var(--muted);
       font-size:15px;
       line-height:1.7;
     }
 
-    .hero-action{
-      margin-top:42px;
+    .action{
+      display:inline-block;
       width:max-content;
-      min-width:220px;
-      border:1px solid #fff;
-      background:#fff;
-      color:#000;
-      padding:16px 18px;
+      margin-top:30px;
+      padding:14px 18px;
+      background:linear-gradient(135deg,var(--gold),#b98a50);
+      color:#1a1217;
       font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      cursor:pointer;
-      transition:background .25s var(--ease), color .25s var(--ease);
-    }
-
-    .hero-action:hover{
-      background:#000;
-      color:#fff;
-    }
-
-    .hero-visual{
-      position:relative;
-      min-height:620px;
-      overflow:hidden;
-      background:
-        linear-gradient(180deg,rgba(255,255,255,.04),transparent 20%),
-        #000;
-    }
-
-    .hero-visual::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(to right,rgba(255,255,255,.04) 1px,transparent 1px),
-        linear-gradient(to bottom,rgba(255,255,255,.04) 1px,transparent 1px);
-      background-size:72px 72px;
-      mask-image:linear-gradient(to bottom,#000,transparent);
-    }
-
-    .light{
-      position:absolute;
-      left:50%;
-      top:6%;
-      width:1px;
-      height:62%;
-      background:linear-gradient(to bottom,transparent,#fff 42%,transparent);
-      box-shadow:0 0 28px rgba(255,255,255,.8);
-      animation:pulse 4s ease-in-out infinite;
-    }
-
-    .frame{
-      position:absolute;
-      inset:9%;
-      border:1px solid var(--line);
-    }
-
-    .frame::before,
-    .frame::after{
-      content:"";
-      position:absolute;
-      width:48px;
-      height:48px;
-    }
-
-    .frame::before{
-      left:-1px;
-      top:-1px;
-      border-top:1px solid #fff;
-      border-left:1px solid #fff;
-    }
-
-    .frame::after{
-      right:-1px;
-      bottom:-1px;
-      border-right:1px solid #fff;
-      border-bottom:1px solid #fff;
-    }
-
-    .visual-word{
-      position:absolute;
-      left:50%;
-      bottom:12%;
-      transform:translateX(-50%);
-      color:transparent;
-      -webkit-text-stroke:1px rgba(255,255,255,.22);
-      font-size:clamp(72px,9vw,150px);
-      line-height:1;
-      font-weight:800;
-      letter-spacing:-.08em;
+      letter-spacing:.14em;
       text-transform:uppercase;
       white-space:nowrap;
-      user-select:none;
     }
 
-    .upload-section{
-      padding:84px 28px;
+    .steps{
+      display:grid;
+      align-content:center;
+      padding:52px;
+    }
+
+    .step{
+      display:grid;
+      grid-template-columns:64px 1fr;
+      gap:22px;
+      padding:26px 0;
       border-bottom:1px solid var(--line);
     }
 
-    .upload-wrap{
-      width:min(980px,100%);
-      margin:0 auto;
+    .step:first-child{
+      border-top:1px solid var(--line);
     }
 
-    .section-label{
-      color:#989898;
-      font-size:9px;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-    }
-
-    .section-title{
-      margin:14px 0 34px;
-      font-size:clamp(40px,6vw,82px);
-      line-height:.9;
-      letter-spacing:-.06em;
-      text-transform:uppercase;
-    }
-
-    .upload-box{
-      min-height:360px;
-      border:1px solid var(--line);
-      position:relative;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:30px;
-      cursor:pointer;
-      overflow:hidden;
-    }
-
-    .upload-box::before,
-    .upload-box::after{
-      content:"";
-      position:absolute;
-      width:46px;
-      height:46px;
-    }
-
-    .upload-box::before{
-      left:16px;
-      top:16px;
-      border-left:1px solid #fff;
-      border-top:1px solid #fff;
-    }
-
-    .upload-box::after{
-      right:16px;
-      bottom:16px;
-      border-right:1px solid #fff;
-      border-bottom:1px solid #fff;
-    }
-
-    .upload-icon{
-      width:54px;
-      height:54px;
-      margin:0 auto 22px;
-      border:1px solid var(--line);
-      display:grid;
-      place-items:center;
-      font-size:22px;
-    }
-
-    .upload-title{
-      font-size:18px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .upload-sub{
-      margin-top:10px;
-      color:#909090;
+    .number{
+      color:var(--gold);
       font-size:11px;
-      letter-spacing:.08em;
+      letter-spacing:.14em;
     }
 
-    .file-status{
-      min-height:16px;
-      margin-top:18px;
-      color:#b6b6b6;
-      font-size:10px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
+    .step h2{
+      margin:0;
+      font-size:20px;
+      letter-spacing:-.02em;
+      white-space:nowrap;
     }
 
-    #photoInput{
-      display:none;
-    }
-
-    .processing{
-      display:none;
-      position:absolute;
-      inset:0;
-      background:#000;
-      z-index:5;
-      place-items:center;
-    }
-
-    .processing.active{
-      display:grid;
-    }
-
-    .scan{
-      width:min(640px,calc(100% - 48px));
-      height:260px;
-      border:1px solid var(--line);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .scan-line{
-      position:absolute;
-      left:0;
-      right:0;
-      height:1px;
-      background:#fff;
-      box-shadow:0 0 16px rgba(255,255,255,.8);
-      animation:scan 1.6s linear infinite;
-    }
-
-    .scan-meta{
-      position:absolute;
-      left:18px;
-      right:18px;
-      bottom:16px;
-      display:flex;
-      justify-content:space-between;
-      color:#a8a8a8;
-      font-size:9px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-    }
-
-    .footer{
-      min-height:86px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 28px;
-      color:#777;
-      font-size:9px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-    }
-
-    .reveal{
-      opacity:0;
-      transform:translateY(24px);
-      transition:opacity .8s var(--ease), transform .8s var(--ease);
-    }
-
-    .reveal.show{
-      opacity:1;
-      transform:none;
-    }
-
-    @keyframes pulse{
-      0%,100%{opacity:.25;transform:scaleY(.75)}
-      50%{opacity:1;transform:scaleY(1)}
-    }
-
-    @keyframes scan{
-      0%{top:0;opacity:0}
-      10%{opacity:1}
-      90%{opacity:1}
-      100%{top:100%;opacity:0}
+    .step p{
+      max-width:520px;
+      margin:9px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
     }
 
     @media(max-width:900px){
-      .hero{
+      .page{
         grid-template-columns:1fr;
       }
 
-      .hero-copy{
+      .intro{
         border-right:0;
         border-bottom:1px solid var(--line);
-        padding:64px 24px;
-      }
-
-      .hero-visual{
-        min-height:460px;
       }
     }
 
-    @media(max-width:600px){
+    @media(max-width:620px){
       .header{
         padding:0 16px;
       }
 
-      .header-meta:last-child{
-        display:none;
+      .intro,
+      .steps{
+        padding:54px 16px;
       }
 
-      .hero-copy{
-        padding:54px 16px 42px;
+      h1{
+        font-size:clamp(38px,12vw,56px);
       }
 
-      .hero-title{
-        font-size:clamp(52px,18vw,86px);
+      .step{
+        grid-template-columns:44px 1fr;
       }
 
-      .hero-action{
-        width:100%;
-      }
-
-      .upload-section{
-        padding:64px 16px;
-      }
-
-      .upload-box{
-        min-height:320px;
-      }
-
-      .footer{
-        padding:24px 16px;
-        align-items:flex-start;
-        gap:12px;
-        flex-direction:column;
+      .step h2{
+        white-space:normal;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="loader" id="loader">
-    <div class="loader-box">
-      <h1 class="loader-title">Studio<br>Aura</h1>
-      <div class="loader-line">
-        <div class="loader-progress" id="loaderProgress"></div>
-      </div>
-      <div class="loader-info">
-        <span>Carregando experiência</span>
-        <span id="loaderPercent">0%</span>
-      </div>
-    </div>
-  </div>
+  <header class="header">
+    <div class="logo">Studio Aura</div>
+    <a class="back" href="index.html">Voltar ao início</a>
+  </header>
 
-  <div class="site" id="site">
-    <header class="header">
-      <div class="logo">Studio Aura</div>
-      <div class="header-meta">Ensaios com IA</div>
-      <div class="header-meta">Brasil · 2026</div>
-    </header>
+  <main class="page">
+    <section class="intro">
+      <div class="eyebrow">Como funciona</div>
 
-    <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow reveal">Fotografia · Inteligência Artificial</div>
+      <h1>Do envio da foto ao ensaio final.</h1>
 
-          <h2 class="hero-title reveal">
-            Sua imagem<br>
-            em outra<br>
-            atmosfera
-          </h2>
+      <p>
+        Um processo simples, pensado para transformar sua imagem em uma nova composição visual.
+      </p>
 
-          <p class="hero-text reveal">
-            Envie uma foto e transforme sua presença em um ensaio visual com direção cinematográfica.
-          </p>
+      <a class="action" href="index.html#upload">Começar ensaio</a>
+    </section>
 
-          <button
-            class="hero-action reveal"
-            type="button"
-            onclick="document.getElementById('upload').scrollIntoView()"
-          >
-            Começar ensaio
-          </button>
+    <section class="steps">
+      <article class="step">
+        <div class="number">01</div>
+        <div>
+          <h2>Envie sua foto</h2>
+          <p>Escolha uma imagem nítida, frontal e bem iluminada.</p>
         </div>
+      </article>
 
-        <div class="hero-visual">
-          <div class="light"></div>
-          <div class="frame"></div>
-          <div class="visual-word">Aura</div>
+      <article class="step">
+        <div class="number">02</div>
+        <div>
+          <h2>Escolha o estilo</h2>
+          <p>Defina a direção visual desejada para o ensaio.</p>
         </div>
-      </section>
+      </article>
 
-      <section class="upload-section" id="upload">
-        <div class="upload-wrap">
-          <div class="section-label reveal">Envio da imagem</div>
-          <h3 class="section-title reveal">Comece com uma foto</h3>
-
-          <label class="upload-box reveal" for="photoInput">
-            <div>
-              <div class="upload-icon">↑</div>
-              <div class="upload-title" id="uploadTitle">Selecione sua foto</div>
-              <div class="upload-sub">JPG, PNG ou WEBP</div>
-              <div class="file-status" id="fileStatus"></div>
-            </div>
-
-            <div class="processing" id="processing">
-              <div class="scan">
-                <div class="scan-line"></div>
-                <div class="scan-meta">
-                  <span>Preparando imagem</span>
-                  <span id="processPercent">0%</span>
-                </div>
-              </div>
-            </div>
-          </label>
-
-          <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" />
+      <article class="step">
+        <div class="number">03</div>
+        <div>
+          <h2>Gere a imagem</h2>
+          <p>A plataforma prepara a nova composição mantendo sua identidade.</p>
         </div>
-      </section>
-    </main>
+      </article>
 
-    <footer class="footer">
-      <div>© 2026 Studio Aura</div>
-      <div>Todos os direitos reservados</div>
-    </footer>
-  </div>
-
-  <script>
-    const loader = document.getElementById("loader");
-    const loaderProgress = document.getElementById("loaderProgress");
-    const loaderPercent = document.getElementById("loaderPercent");
-    const site = document.getElementById("site");
-
-    let loading = 0;
-
-    const loadingInterval = setInterval(() => {
-      loading += Math.floor(Math.random() * 8) + 4;
-
-      if (loading >= 100) {
-        loading = 100;
-        clearInterval(loadingInterval);
-
-        setTimeout(() => {
-          loader.classList.add("hidden");
-          site.classList.add("visible");
-          revealVisible();
-        }, 350);
-      }
-
-      loaderProgress.style.width = loading + "%";
-      loaderPercent.textContent = loading + "%";
-    }, 90);
-
-    const reveals = document.querySelectorAll(".reveal");
-
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("show");
-        }
-      });
-    }, { threshold: 0.15 });
-
-    reveals.forEach(item => observer.observe(item));
-
-    function revealVisible() {
-      reveals.forEach(item => {
-        if (item.getBoundingClientRect().top < window.innerHeight * .9) {
-          item.classList.add("show");
-        }
-      });
-    }
-
-    const photoInput = document.getElementById("photoInput");
-    const uploadTitle = document.getElementById("uploadTitle");
-    const fileStatus = document.getElementById("fileStatus");
-    const processing = document.getElementById("processing");
-    const processPercent = document.getElementById("processPercent");
-
-    photoInput.addEventListener("change", () => {
-      const file = photoInput.files?.[0];
-      if (!file) return;
-
-      uploadTitle.textContent = file.name;
-      fileStatus.textContent = "Imagem selecionada";
-
-      processing.classList.add("active");
-
-      let progress = 0;
-      processPercent.textContent = "0%";
-
-      const processInterval = setInterval(() => {
-        progress += Math.floor(Math.random() * 9) + 3;
-
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(processInterval);
-
-          setTimeout(() => {
-            processing.classList.remove("active");
-            fileStatus.textContent = "Imagem pronta";
-          }, 500);
-        }
-
-        processPercent.textContent = progress + "%";
-      }, 110);
-    });
-  </script>
+      <article class="step">
+        <div class="number">04</div>
+        <div>
+          <h2>Receba o resultado</h2>
+          <p>Visualize o ensaio final e faça novas variações.</p>
+        </div>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
