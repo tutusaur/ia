@@ -2,246 +2,1197 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#14101a" />
-  <title>Como funciona — Studio Aura</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17121f" />
+  <title>Studio Aura — AI Portrait Lab</title>
+  <meta name="description" content="Web app premium para criar prompts e ensaios fotográficos com inteligência artificial." />
 
   <style>
     :root{
-      --bg:#14101a;
-      --panel:#21192b;
-      --text:#fff8f2;
-      --muted:#c2b5c8;
-      --gold:#d6b06f;
-      --line:rgba(255,255,255,.12);
+      --bg:#17121f;
+      --bg-soft:#1e1728;
+      --panel:#241b30;
+      --panel-2:#2d223b;
+      --text:#fffaf5;
+      --muted:#b8adbe;
+      --muted-2:#8e8295;
+      --gold:#d8b77c;
+      --rose:#a46d80;
+      --rose-2:#71485b;
+      --success:#7fc19c;
+      --danger:#dd8f8f;
+      --line:rgba(255,255,255,.10);
+      --line-strong:rgba(216,183,124,.38);
+      --shadow:0 24px 80px rgba(0,0,0,.34);
       --ease:cubic-bezier(.22,.61,.36,1);
+      --radius:22px;
     }
 
     *{box-sizing:border-box}
+
+    html{
+      scroll-behavior:smooth;
+      background:var(--bg);
+    }
 
     body{
       margin:0;
       min-height:100vh;
       color:var(--text);
       background:
-        radial-gradient(circle at 80% 20%,rgba(167,109,125,.16),transparent 26%),
+        radial-gradient(circle at 85% 0%, rgba(164,109,128,.18), transparent 26%),
+        radial-gradient(circle at 10% 100%, rgba(216,183,124,.09), transparent 24%),
         var(--bg);
-      font-family:Inter,Arial,Helvetica,sans-serif;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x:hidden;
     }
 
-    a{
-      color:inherit;
-      text-decoration:none;
+    button,input,textarea,select{font:inherit}
+    button{color:inherit}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    .site-loader{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:grid;
+      place-items:center;
+      background:var(--bg);
+      transition:opacity .7s var(--ease),visibility .7s var(--ease);
     }
 
-    .header{
-      height:76px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 34px;
-      border-bottom:1px solid var(--line);
+    .site-loader.hidden{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
     }
 
-    .logo{
-      font-size:16px;
+    .loader-shell{
+      width:min(560px,calc(100vw - 36px));
+    }
+
+    .loader-logo{
+      font-size:clamp(34px,8vw,62px);
+      line-height:1;
+      letter-spacing:-.05em;
       font-weight:700;
       white-space:nowrap;
     }
 
-    .back{
+    .loader-sub{
+      margin-top:10px;
       color:var(--muted);
-      font-size:10px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      white-space:nowrap;
-      transition:color .25s var(--ease);
-    }
-
-    .back:hover{
-      color:var(--gold);
-    }
-
-    .page{
-      min-height:calc(100vh - 76px);
-      display:grid;
-      grid-template-columns:.9fr 1.1fr;
-    }
-
-    .intro{
-      padding:72px 54px;
-      border-right:1px solid var(--line);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-    }
-
-    .eyebrow{
-      margin-bottom:20px;
-      color:var(--gold);
       font-size:10px;
       letter-spacing:.18em;
       text-transform:uppercase;
+    }
+
+    .loader-track{
+      margin-top:34px;
+      height:2px;
+      background:rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+
+    .loader-progress{
+      width:0;
+      height:100%;
+      background:linear-gradient(90deg,var(--gold),var(--rose));
+      transition:width .12s linear;
+    }
+
+    .loader-meta{
+      display:flex;
+      justify-content:space-between;
+      margin-top:10px;
+      color:var(--muted-2);
+      font-size:10px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .app{
+      min-height:100vh;
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity .8s var(--ease),transform .8s var(--ease);
+    }
+
+    .app.visible{
+      opacity:1;
+      transform:none;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      height:72px;
+      padding:0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      border-bottom:1px solid var(--line);
+      background:rgba(23,18,31,.78);
+      backdrop-filter:blur(18px);
+    }
+
+    .brand{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:11px;
+    }
+
+    .brand-mark{
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--line-strong);
+      background:linear-gradient(145deg,rgba(216,183,124,.14),rgba(164,109,128,.14));
+      color:var(--gold);
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.08em;
+    }
+
+    .brand-copy{
+      min-width:0;
+    }
+
+    .brand-name{
+      font-size:14px;
+      font-weight:700;
       white-space:nowrap;
     }
 
-    h1{
-      margin:0;
-      max-width:680px;
-      font-size:clamp(40px,5vw,68px);
-      line-height:1;
-      letter-spacing:-.05em;
-      font-weight:600;
+    .brand-sub{
+      color:var(--muted-2);
+      font-size:9px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .topbar-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .credits{
+      display:none;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      color:var(--muted);
+      font-size:10px;
+      letter-spacing:.08em;
+      white-space:nowrap;
+    }
+
+    .ghost-button,
+    .primary-button,
+    .secondary-button{
+      border:0;
+      cursor:pointer;
+      transition:all .25s var(--ease);
+    }
+
+    .ghost-button{
+      width:40px;
+      height:40px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.025);
+      display:grid;
+      place-items:center;
+    }
+
+    .ghost-button:hover{border-color:var(--line-strong)}
+
+    .page{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:24px 14px 110px;
+    }
+
+    .intro{
+      padding:14px 2px 22px;
+    }
+
+    .eyebrow{
+      color:var(--gold);
+      font-size:9px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+
+    .intro h1{
+      margin:10px 0 0;
+      max-width:720px;
+      font-size:clamp(32px,8vw,58px);
+      line-height:1.02;
+      letter-spacing:-.045em;
+      font-weight:650;
     }
 
     .intro p{
-      max-width:500px;
-      margin:26px 0 0;
+      max-width:620px;
+      margin:14px 0 0;
       color:var(--muted);
-      font-size:15px;
-      line-height:1.7;
+      font-size:14px;
+      line-height:1.65;
     }
 
-    .action{
-      display:inline-block;
-      width:max-content;
-      margin-top:30px;
-      padding:14px 18px;
-      background:linear-gradient(135deg,var(--gold),#b98a50);
-      color:#1a1217;
-      font-size:10px;
+    .workspace{
+      display:grid;
+      gap:14px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.025),transparent 52%),
+        rgba(36,27,48,.84);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+
+    .card-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:18px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .step-badge{
+      color:var(--gold);
+      font-size:9px;
       letter-spacing:.14em;
       text-transform:uppercase;
       white-space:nowrap;
     }
 
-    .steps{
-      display:grid;
-      align-content:center;
-      padding:52px;
-    }
-
-    .step{
-      display:grid;
-      grid-template-columns:64px 1fr;
-      gap:22px;
-      padding:26px 0;
-      border-bottom:1px solid var(--line);
-    }
-
-    .step:first-child{
-      border-top:1px solid var(--line);
-    }
-
-    .number{
-      color:var(--gold);
-      font-size:11px;
-      letter-spacing:.14em;
-    }
-
-    .step h2{
-      margin:0;
-      font-size:20px;
+    .card-title{
+      margin:6px 0 0;
+      font-size:18px;
+      font-weight:650;
       letter-spacing:-.02em;
-      white-space:nowrap;
     }
 
-    .step p{
-      max-width:520px;
-      margin:9px 0 0;
+    .card-sub{
+      margin:5px 0 0;
+      color:var(--muted-2);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .status-dot{
+      width:9px;
+      height:9px;
+      margin-top:5px;
+      border-radius:50%;
+      background:#5f5764;
+      box-shadow:0 0 0 5px rgba(255,255,255,.025);
+    }
+
+    .status-dot.ready{
+      background:var(--success);
+      box-shadow:0 0 0 5px rgba(127,193,156,.08);
+    }
+
+    .upload-grid{
+      display:grid;
+      gap:14px;
+      padding:14px;
+    }
+
+    .upload-box{
+      min-height:250px;
+      position:relative;
+      display:grid;
+      place-items:center;
+      padding:22px;
+      text-align:center;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(255,255,255,.018);
+      cursor:pointer;
+      overflow:hidden;
+      border-radius:18px;
+      transition:border-color .25s var(--ease),background .25s var(--ease),transform .25s var(--ease);
+    }
+
+    .upload-box:hover,
+    .upload-box.dragging{
+      border-color:var(--line-strong);
+      background:rgba(216,183,124,.035);
+      transform:translateY(-2px);
+    }
+
+    .upload-box.has-image{
+      border-style:solid;
+      border-color:rgba(216,183,124,.28);
+    }
+
+    .upload-preview{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:0;
+      transition:opacity .3s var(--ease);
+    }
+
+    .upload-box.has-image .upload-preview{
+      opacity:1;
+    }
+
+    .upload-box.has-image::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top,rgba(23,18,31,.92),rgba(23,18,31,.08) 55%);
+    }
+
+    .upload-content{
+      position:relative;
+      z-index:2;
+    }
+
+    .upload-icon{
+      width:54px;
+      height:54px;
+      margin:0 auto 16px;
+      border:1px solid var(--line-strong);
+      display:grid;
+      place-items:center;
+      color:var(--gold);
+      font-size:20px;
+      border-radius:16px;
+      background:rgba(23,18,31,.48);
+      backdrop-filter:blur(10px);
+    }
+
+    .upload-name{
+      font-size:15px;
+      font-weight:650;
+    }
+
+    .upload-help{
+      margin-top:7px;
+      color:var(--muted-2);
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    .upload-file{
+      margin-top:12px;
+      min-height:16px;
+      color:var(--gold);
+      font-size:10px;
+      letter-spacing:.08em;
+    }
+
+    .hidden-input{display:none}
+
+    .prompt-card{
+      padding-bottom:14px;
+    }
+
+    .prompt-body{
+      padding:14px;
+    }
+
+    .prompt-toolbar{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+
+    .prompt-toolbar::-webkit-scrollbar{display:none}
+
+    .chip{
+      flex:0 0 auto;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
       color:var(--muted);
+      padding:9px 11px;
+      border-radius:999px;
+      font-size:10px;
+      cursor:pointer;
+      transition:all .2s var(--ease);
+    }
+
+    .chip.active,
+    .chip:hover{
+      border-color:var(--line-strong);
+      color:var(--gold);
+      background:rgba(216,183,124,.05);
+    }
+
+    .prompt-editor{
+      width:100%;
+      min-height:240px;
+      resize:vertical;
+      border:1px solid var(--line);
+      outline:none;
+      border-radius:16px;
+      background:rgba(15,12,20,.46);
+      color:var(--text);
+      padding:16px;
       font-size:13px;
+      line-height:1.65;
+      transition:border-color .25s var(--ease),box-shadow .25s var(--ease);
+    }
+
+    .prompt-editor:focus{
+      border-color:var(--line-strong);
+      box-shadow:0 0 0 4px rgba(216,183,124,.05);
+    }
+
+    .prompt-actions{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .primary-button,
+    .secondary-button{
+      min-height:48px;
+      padding:0 16px;
+      border-radius:14px;
+      font-size:11px;
+      letter-spacing:.11em;
+      text-transform:uppercase;
+    }
+
+    .primary-button{
+      background:linear-gradient(135deg,var(--gold),#bb8e56);
+      color:#1c141a;
+      font-weight:750;
+      box-shadow:0 14px 34px rgba(190,145,87,.18);
+    }
+
+    .primary-button:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.04);
+    }
+
+    .secondary-button{
+      border:1px solid var(--line);
+      background:transparent;
+      color:var(--text);
+    }
+
+    .secondary-button:hover{
+      border-color:var(--line-strong);
+      color:var(--gold);
+    }
+
+    .generate-panel{
+      margin-top:14px;
+      padding:16px;
+      display:grid;
+      gap:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.018);
+      border-radius:18px;
+    }
+
+    .generate-copy strong{
+      display:block;
+      font-size:14px;
+    }
+
+    .generate-copy span{
+      display:block;
+      margin-top:5px;
+      color:var(--muted-2);
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    .generate-button{
+      min-height:52px;
+      border:0;
+      border-radius:15px;
+      background:linear-gradient(135deg,var(--rose),var(--rose-2));
+      color:#fff;
+      font-weight:750;
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow:0 16px 38px rgba(113,72,91,.24);
+      transition:transform .25s var(--ease),filter .25s var(--ease),opacity .25s var(--ease);
+    }
+
+    .generate-button:hover{transform:translateY(-2px);filter:brightness(1.05)}
+    .generate-button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+    .result-card{
+      display:none;
+    }
+
+    .result-card.visible{
+      display:block;
+    }
+
+    .result-body{
+      padding:14px;
+    }
+
+    .result-placeholder{
+      min-height:360px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(circle at center,rgba(216,183,124,.08),transparent 38%),
+        rgba(255,255,255,.015);
+      border-radius:18px;
+      text-align:center;
+      padding:24px;
+    }
+
+    .result-placeholder strong{
+      display:block;
+      font-size:18px;
+    }
+
+    .result-placeholder span{
+      display:block;
+      margin-top:8px;
+      color:var(--muted-2);
+      font-size:12px;
+    }
+
+    .bottom-nav{
+      position:fixed;
+      left:10px;
+      right:10px;
+      bottom:max(10px,env(safe-area-inset-bottom));
+      z-index:60;
+      min-height:64px;
+      padding:8px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:4px;
+      border:1px solid var(--line);
+      background:rgba(30,23,40,.86);
+      backdrop-filter:blur(18px);
+      border-radius:20px;
+      box-shadow:0 18px 44px rgba(0,0,0,.34);
+    }
+
+    .bottom-item{
+      border:0;
+      background:transparent;
+      color:var(--muted-2);
+      display:grid;
+      place-items:center;
+      gap:3px;
+      padding:6px;
+      border-radius:14px;
+      font-size:9px;
+      cursor:pointer;
+    }
+
+    .bottom-item.active{
+      color:var(--gold);
+      background:rgba(216,183,124,.06);
+    }
+
+    .bottom-icon{
+      font-size:17px;
+      line-height:1;
+    }
+
+    .process-overlay{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background:rgba(18,14,24,.92);
+      backdrop-filter:blur(18px);
+    }
+
+    .process-overlay.active{
+      display:grid;
+    }
+
+    .process-box{
+      width:min(620px,100%);
+      border:1px solid var(--line);
+      background:var(--panel);
+      padding:18px;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .process-visual{
+      height:260px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:
+        linear-gradient(135deg,rgba(216,183,124,.05),rgba(164,109,128,.05)),
+        var(--bg-soft);
+    }
+
+    .scan-line{
+      position:absolute;
+      left:0;
+      right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+      box-shadow:0 0 16px rgba(216,183,124,.6);
+      animation:scan 1.7s linear infinite;
+    }
+
+    .process-grid{
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:44px 44px;
+    }
+
+    .process-copy{
+      margin-top:16px;
+    }
+
+    .process-title{
+      font-size:18px;
+      font-weight:700;
+    }
+
+    .process-text{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
       line-height:1.6;
     }
 
-    @media(max-width:900px){
-      .page{
-        grid-template-columns:1fr;
-      }
-
-      .intro{
-        border-right:0;
-        border-bottom:1px solid var(--line);
-      }
+    .process-bar{
+      height:3px;
+      margin-top:16px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      border-radius:999px;
     }
 
-    @media(max-width:620px){
-      .header{
-        padding:0 16px;
-      }
+    .process-fill{
+      width:0;
+      height:100%;
+      background:linear-gradient(90deg,var(--gold),var(--rose));
+      transition:width .16s linear;
+    }
 
-      .intro,
-      .steps{
-        padding:54px 16px;
-      }
+    .process-meta{
+      display:flex;
+      justify-content:space-between;
+      margin-top:10px;
+      color:var(--muted-2);
+      font-size:10px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
 
-      h1{
-        font-size:clamp(38px,12vw,56px);
-      }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:92px;
+      transform:translateX(-50%) translateY(20px);
+      z-index:1000;
+      max-width:calc(100vw - 28px);
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(36,27,48,.96);
+      color:var(--text);
+      font-size:11px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s var(--ease),transform .25s var(--ease);
+      box-shadow:var(--shadow);
+    }
 
-      .step{
-        grid-template-columns:44px 1fr;
-      }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
 
-      .step h2{
-        white-space:normal;
+    @keyframes scan{
+      0%{top:0;opacity:0}
+      10%{opacity:1}
+      90%{opacity:1}
+      100%{top:100%;opacity:0}
+    }
+
+    @media(min-width:720px){
+      .page{padding:36px 24px 60px}
+      .credits{display:block}
+      .workspace{
+        grid-template-columns:1fr 1fr;
+      }
+      .upload-grid{
+        grid-template-columns:1fr 1fr;
+      }
+      .prompt-card{
+        grid-column:1/-1;
+      }
+      .prompt-actions{
+        grid-template-columns:1fr 1fr;
+      }
+      .generate-panel{
+        grid-template-columns:1fr auto;
+        align-items:center;
+      }
+      .generate-button{
+        min-width:220px;
+        padding:0 24px;
+      }
+      .bottom-nav{display:none}
+      .toast{bottom:26px}
+    }
+
+    @media(min-width:1024px){
+      .page{padding:48px 28px 70px}
+      .workspace{
+        grid-template-columns:1fr 1fr;
+      }
+      .prompt-card{
+        grid-column:1/-1;
+      }
+      .upload-box{
+        min-height:320px;
+      }
+      .prompt-editor{
+        min-height:280px;
       }
     }
   </style>
 </head>
 
 <body>
-  <header class="header">
-    <div class="logo">Studio Aura</div>
-    <a class="back" href="index.html">Voltar ao início</a>
-  </header>
+  <div class="site-loader" id="siteLoader">
+    <div class="loader-shell">
+      <div class="loader-logo">Studio Aura</div>
+      <div class="loader-sub">AI Portrait Lab</div>
+      <div class="loader-track">
+        <div class="loader-progress" id="loaderProgress"></div>
+      </div>
+      <div class="loader-meta">
+        <span>Preparando experiência</span>
+        <span id="loaderPercent">0%</span>
+      </div>
+    </div>
+  </div>
 
-  <main class="page">
-    <section class="intro">
-      <div class="eyebrow">Como funciona</div>
-
-      <h1>Do envio da foto ao ensaio final.</h1>
-
-      <p>
-        Um processo simples, pensado para transformar sua imagem em uma nova composição visual.
-      </p>
-
-      <a class="action" href="index.html#upload">Começar ensaio</a>
-    </section>
-
-    <section class="steps">
-      <article class="step">
-        <div class="number">01</div>
-        <div>
-          <h2>Envie sua foto</h2>
-          <p>Escolha uma imagem nítida, frontal e bem iluminada.</p>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">SA</div>
+        <div class="brand-copy">
+          <div class="brand-name">Studio Aura</div>
+          <div class="brand-sub">AI Portrait Lab</div>
         </div>
-      </article>
+      </div>
 
-      <article class="step">
-        <div class="number">02</div>
-        <div>
-          <h2>Escolha o estilo</h2>
-          <p>Defina a direção visual desejada para o ensaio.</p>
-        </div>
-      </article>
+      <div class="topbar-actions">
+        <div class="credits">20 créditos</div>
+        <button class="ghost-button" type="button" aria-label="Configurações">⚙</button>
+      </div>
+    </header>
 
-      <article class="step">
-        <div class="number">03</div>
-        <div>
-          <h2>Gere a imagem</h2>
-          <p>A plataforma prepara a nova composição mantendo sua identidade.</p>
-        </div>
-      </article>
+    <main class="page">
+      <section class="intro">
+        <div class="eyebrow">Criação de ensaios com IA</div>
+        <h1>Crie uma nova imagem a partir de duas referências.</h1>
+        <p>Envie a cena desejada e a foto da pessoa. O sistema prepara um prompt editável antes da geração.</p>
+      </section>
 
-      <article class="step">
-        <div class="number">04</div>
-        <div>
-          <h2>Receba o resultado</h2>
-          <p>Visualize o ensaio final e faça novas variações.</p>
+      <section class="workspace">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="step-badge">Etapa 01</div>
+              <h2 class="card-title">Foto de referência</h2>
+              <p class="card-sub">Cenário, roupa, pose e iluminação.</p>
+            </div>
+            <div class="status-dot" id="referenceStatus"></div>
+          </div>
+
+          <div class="upload-grid">
+            <label class="upload-box" id="referenceBox" for="referenceInput">
+              <img class="upload-preview" id="referencePreview" alt="Prévia da foto de referência" />
+              <div class="upload-content">
+                <div class="upload-icon">＋</div>
+                <div class="upload-name">Adicionar referência</div>
+                <div class="upload-help">JPG, PNG ou WEBP<br>até 10 MB</div>
+                <div class="upload-file" id="referenceFile"></div>
+              </div>
+            </label>
+            <input class="hidden-input" id="referenceInput" type="file" accept="image/jpeg,image/png,image/webp" />
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="step-badge">Etapa 02</div>
+              <h2 class="card-title">Foto da pessoa</h2>
+              <p class="card-sub">Imagem nítida, frontal e sem filtros pesados.</p>
+            </div>
+            <div class="status-dot" id="personStatus"></div>
+          </div>
+
+          <div class="upload-grid">
+            <label class="upload-box" id="personBox" for="personInput">
+              <img class="upload-preview" id="personPreview" alt="Prévia da foto da pessoa" />
+              <div class="upload-content">
+                <div class="upload-icon">＋</div>
+                <div class="upload-name">Adicionar pessoa</div>
+                <div class="upload-help">Rosto visível e boa iluminação<br>até 10 MB</div>
+                <div class="upload-file" id="personFile"></div>
+              </div>
+            </label>
+            <input class="hidden-input" id="personInput" type="file" accept="image/jpeg,image/png,image/webp" />
+          </div>
+        </article>
+
+        <article class="card prompt-card">
+          <div class="card-head">
+            <div>
+              <div class="step-badge">Etapa 03</div>
+              <h2 class="card-title">Gerador de prompt</h2>
+              <p class="card-sub">Crie, revise e edite as instruções antes de gerar.</p>
+            </div>
+            <div class="status-dot" id="promptStatus"></div>
+          </div>
+
+          <div class="prompt-body">
+            <div class="prompt-toolbar">
+              <button class="chip active" type="button" data-style="cinematográfico">Cinematográfico</button>
+              <button class="chip" type="button" data-style="editorial">Editorial</button>
+              <button class="chip" type="button" data-style="luxuoso">Luxuoso</button>
+              <button class="chip" type="button" data-style="natural">Natural</button>
+              <button class="chip" type="button" data-style="executivo">Executivo</button>
+            </div>
+
+            <textarea
+              class="prompt-editor"
+              id="promptEditor"
+              placeholder="O prompt será criado depois que as duas fotos forem adicionadas."
+            ></textarea>
+
+            <div class="prompt-actions">
+              <button class="secondary-button" id="generatePromptButton" type="button">
+                Gerar prompt
+              </button>
+              <button class="secondary-button" id="copyPromptButton" type="button">
+                Copiar prompt
+              </button>
+            </div>
+
+            <div class="generate-panel">
+              <div class="generate-copy">
+                <strong>Pronto para gerar</strong>
+                <span>O prompt continuará editável até o envio final.</span>
+              </div>
+              <button class="generate-button" id="generateImageButton" type="button" disabled>
+                Gerar imagem
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card result-card" id="resultCard">
+          <div class="card-head">
+            <div>
+              <div class="step-badge">Resultado</div>
+              <h2 class="card-title">Imagem gerada</h2>
+              <p class="card-sub">Área preparada para receber o resultado da API.</p>
+            </div>
+          </div>
+
+          <div class="result-body">
+            <div class="result-placeholder">
+              <div>
+                <strong>Resultado pronto para integração</strong>
+                <span>Quando a API for conectada, a imagem aparecerá aqui.</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-item active" type="button">
+        <span class="bottom-icon">⌂</span>
+        <span>Início</span>
+      </button>
+      <button class="bottom-item" type="button" onclick="document.getElementById('referenceBox').scrollIntoView()">
+        <span class="bottom-icon">◫</span>
+        <span>Fotos</span>
+      </button>
+      <button class="bottom-item" type="button" onclick="document.getElementById('promptEditor').scrollIntoView()">
+        <span class="bottom-icon">✦</span>
+        <span>Prompt</span>
+      </button>
+      <button class="bottom-item" type="button">
+        <span class="bottom-icon">◎</span>
+        <span>Perfil</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="process-overlay" id="processOverlay">
+    <div class="process-box">
+      <div class="process-visual">
+        <div class="process-grid"></div>
+        <div class="scan-line"></div>
+      </div>
+      <div class="process-copy">
+        <div class="process-title" id="processTitle">Analisando referências</div>
+        <div class="process-text" id="processText">Identificando cenário, composição, iluminação e identidade visual.</div>
+        <div class="process-bar">
+          <div class="process-fill" id="processFill"></div>
         </div>
-      </article>
-    </section>
-  </main>
+        <div class="process-meta">
+          <span>Processamento</span>
+          <span id="processPercent">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const siteLoader = document.getElementById("siteLoader");
+    const loaderProgress = document.getElementById("loaderProgress");
+    const loaderPercent = document.getElementById("loaderPercent");
+    const app = document.getElementById("app");
+
+    let loading = 0;
+    const loadingTimer = setInterval(() => {
+      loading += Math.floor(Math.random() * 8) + 4;
+      if (loading >= 100) {
+        loading = 100;
+        clearInterval(loadingTimer);
+        setTimeout(() => {
+          siteLoader.classList.add("hidden");
+          app.classList.add("visible");
+        }, 350);
+      }
+      loaderProgress.style.width = loading + "%";
+      loaderPercent.textContent = loading + "%";
+    }, 90);
+
+    const state = {
+      reference: null,
+      person: null,
+      style: "cinematográfico",
+      prompt: ""
+    };
+
+    const toast = document.getElementById("toast");
+    let toastTimer;
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function bindUpload({ inputId, boxId, previewId, fileId, statusId, stateKey }) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(boxId);
+      const preview = document.getElementById(previewId);
+      const fileLabel = document.getElementById(fileId);
+      const status = document.getElementById(statusId);
+
+      function loadFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          showToast("Selecione um arquivo de imagem.");
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          showToast("A imagem deve ter no máximo 10 MB.");
+          return;
+        }
+
+        state[stateKey] = file;
+        const reader = new FileReader();
+        reader.onload = event => {
+          preview.src = event.target.result;
+          box.classList.add("has-image");
+          fileLabel.textContent = file.name;
+          status.classList.add("ready");
+          updateGenerateState();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      input.addEventListener("change", () => loadFile(input.files?.[0]));
+
+      ["dragenter","dragover"].forEach(eventName => {
+        box.addEventListener(eventName, event => {
+          event.preventDefault();
+          box.classList.add("dragging");
+        });
+      });
+
+      ["dragleave","drop"].forEach(eventName => {
+        box.addEventListener(eventName, event => {
+          event.preventDefault();
+          box.classList.remove("dragging");
+        });
+      });
+
+      box.addEventListener("drop", event => {
+        loadFile(event.dataTransfer.files?.[0]);
+      });
+    }
+
+    bindUpload({
+      inputId:"referenceInput",
+      boxId:"referenceBox",
+      previewId:"referencePreview",
+      fileId:"referenceFile",
+      statusId:"referenceStatus",
+      stateKey:"reference"
+    });
+
+    bindUpload({
+      inputId:"personInput",
+      boxId:"personBox",
+      previewId:"personPreview",
+      fileId:"personFile",
+      statusId:"personStatus",
+      stateKey:"person"
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach(item => item.classList.remove("active"));
+        chip.classList.add("active");
+        state.style = chip.dataset.style;
+      });
+    });
+
+    const promptEditor = document.getElementById("promptEditor");
+    const promptStatus = document.getElementById("promptStatus");
+    const generateImageButton = document.getElementById("generateImageButton");
+
+    promptEditor.addEventListener("input", () => {
+      state.prompt = promptEditor.value.trim();
+      promptStatus.classList.toggle("ready", Boolean(state.prompt));
+      updateGenerateState();
+    });
+
+    function updateGenerateState() {
+      const ready = Boolean(state.reference && state.person && promptEditor.value.trim());
+      generateImageButton.disabled = !ready;
+    }
+
+    const processOverlay = document.getElementById("processOverlay");
+    const processFill = document.getElementById("processFill");
+    const processPercent = document.getElementById("processPercent");
+    const processTitle = document.getElementById("processTitle");
+    const processText = document.getElementById("processText");
+
+    function runProcess({title, text, onComplete}) {
+      processTitle.textContent = title;
+      processText.textContent = text;
+      processFill.style.width = "0%";
+      processPercent.textContent = "0%";
+      processOverlay.classList.add("active");
+
+      let progress = 0;
+      const timer = setInterval(() => {
+        progress += Math.floor(Math.random() * 8) + 3;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(timer);
+          setTimeout(() => {
+            processOverlay.classList.remove("active");
+            onComplete?.();
+          }, 450);
+        }
+        processFill.style.width = progress + "%";
+        processPercent.textContent = progress + "%";
+      }, 110);
+    }
+
+    document.getElementById("generatePromptButton").addEventListener("click", () => {
+      if (!state.reference || !state.person) {
+        showToast("Adicione as duas fotos antes de gerar o prompt.");
+        return;
+      }
+
+      runProcess({
+        title:"Criando prompt",
+        text:"Combinando cenário, roupa, pose, iluminação e identidade da pessoa.",
+        onComplete:() => {
+          const prompt = `Crie um retrato ${state.style}, fotorealista e de alta qualidade, utilizando a foto de referência como base para o cenário, roupa, pose, enquadramento e iluminação. Use a foto da pessoa para preservar com fidelidade o rosto, identidade e características físicas. Mantenha composição natural, proporções realistas, textura de pele detalhada, iluminação profissional e acabamento premium. Não misture traços faciais, não altere a identidade da pessoa e não inclua textos, marcas ou elementos adicionais.`;
+          promptEditor.value = prompt;
+          state.prompt = prompt;
+          promptStatus.classList.add("ready");
+          updateGenerateState();
+          promptEditor.scrollIntoView({behavior:"smooth",block:"center"});
+          showToast("Prompt criado. Você pode editar antes de gerar.");
+        }
+      });
+    });
+
+    document.getElementById("copyPromptButton").addEventListener("click", async () => {
+      const text = promptEditor.value.trim();
+      if (!text) {
+        showToast("Gere ou escreva um prompt primeiro.");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Prompt copiado.");
+      } catch {
+        promptEditor.select();
+        document.execCommand("copy");
+        showToast("Prompt copiado.");
+      }
+    });
+
+    document.getElementById("generateImageButton").addEventListener("click", () => {
+      if (generateImageButton.disabled) return;
+
+      runProcess({
+        title:"Gerando imagem",
+        text:"Preparando a composição final com base nas fotos e no prompt editado.",
+        onComplete:() => {
+          document.getElementById("resultCard").classList.add("visible");
+          document.getElementById("resultCard").scrollIntoView({behavior:"smooth",block:"center"});
+          showToast("Estrutura pronta para receber o resultado da API.");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
