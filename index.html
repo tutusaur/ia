@@ -3,522 +3,1327 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Studio Aura IA</title>
-  <meta name="description" content="Plataforma de ensaios fotográficos com inteligência artificial." />
+  <meta name="theme-color" content="#000000" />
+  <title>Studio Aura — Ensaios com IA</title>
+  <meta
+    name="description"
+    content="Plataforma cinematográfica de ensaios fotográficos com inteligência artificial."
+  />
+
   <style>
-    :root{
-      --bg:#0b0b12;
-      --card:#151521;
-      --card-2:#1d1d2c;
-      --text:#ffffff;
-      --muted:#b7b7c9;
-      --line:rgba(255,255,255,.09);
-      --pink:#ff4fa3;
-      --purple:#8b5cf6;
-      --blue:#4f7cff;
-      --success:#35d07f;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
+    :root {
+      --black: #000;
+      --white: #fff;
+      --gray-1: #0a0a0a;
+      --gray-2: #111;
+      --gray-3: #1a1a1a;
+      --gray-4: #2a2a2a;
+      --gray-5: #777;
+      --gray-6: #bdbdbd;
+      --line: rgba(255,255,255,.16);
+      --line-strong: rgba(255,255,255,.35);
+      --ease: cubic-bezier(.22,.61,.36,1);
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    * {
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--black);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--white);
+      background: var(--black);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    ::selection {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    /* LOADING SCREEN */
+    .site-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      background: var(--black);
+      transition: opacity .8s var(--ease), visibility .8s var(--ease);
+    }
+
+    .site-loader.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-inner {
+      width: min(720px, calc(100vw - 48px));
+    }
+
+    .loader-kicker,
+    .eyebrow,
+    .nav-label,
+    .meta,
+    .section-index,
+    .credit-label,
+    .model-meta,
+    .footer-copy {
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    .loader-brand {
+      margin: 0;
+      font-size: clamp(42px, 8vw, 108px);
+      line-height: .85;
+      font-weight: 800;
+      letter-spacing: -.06em;
+    }
+
+    .loader-kicker {
+      margin-top: 24px;
+      font-size: 10px;
+      color: var(--gray-6);
+    }
+
+    .loader-track {
+      position: relative;
+      width: 100%;
+      height: 1px;
+      margin-top: 54px;
+      background: rgba(255,255,255,.12);
+      overflow: hidden;
+    }
+
+    .loader-progress {
+      width: 0%;
+      height: 100%;
+      background: var(--white);
+      transition: width .15s linear;
+    }
+
+    .loader-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 14px;
+      color: var(--gray-6);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    /* GLOBAL LAYOUT */
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+
+    .app.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid var(--line);
+      padding: 28px 20px;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      font-size: 9px;
+      letter-spacing: .24em;
+      color: var(--gray-6);
+      writing-mode: vertical-rl;
+    }
+
+    .main-nav {
+      display: grid;
+      gap: 0;
+      margin-top: 26px;
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: var(--gray-5);
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      transition: color .25s var(--ease), padding-left .25s var(--ease);
+    }
+
+    .nav-link::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 0;
+      height: 1px;
+      background: var(--white);
+      transition: width .25s var(--ease);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--white);
+      padding-left: 28px;
+    }
+
+    .nav-link:hover::before,
+    .nav-link.active::before {
+      width: 18px;
+    }
+
+    .credits {
+      margin-top: auto;
+      border: 1px solid var(--line);
+      padding: 18px;
+    }
+
+    .credit-label {
+      font-size: 9px;
+      color: var(--gray-6);
+    }
+
+    .credit-value {
+      margin: 12px 0 2px;
+      font-size: 40px;
+      line-height: 1;
+      font-weight: 300;
+    }
+
+    .credit-sub {
+      margin: 0 0 18px;
+      color: var(--gray-5);
+      font-size: 11px;
+    }
+
+    .line-button {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      padding: 13px 14px;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .line-button::after {
+      content: "→";
+      position: absolute;
+      right: 14px;
+      transition: transform .25s var(--ease);
+    }
+
+    .line-button:hover::after {
+      transform: translateX(5px);
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 76px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 34px;
+    }
+
+    .topbar-left {
+      font-size: 10px;
+      color: var(--gray-6);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .menu-button {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .menu-button span,
+    .menu-button::before,
+    .menu-button::after {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--white);
+      margin: 4px auto;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: calc(100vh - 76px);
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-copy {
+      padding: 74px 48px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      color: var(--gray-6);
+      margin-bottom: 28px;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: clamp(58px, 7vw, 118px);
+      line-height: .83;
+      letter-spacing: -.075em;
+      text-transform: uppercase;
+      max-width: 920px;
+    }
+
+    .hero-description {
+      max-width: 560px;
+      margin: 34px 0 0;
+      color: var(--gray-6);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0;
+      margin-top: 42px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-width: 210px;
+      border: 1px solid var(--white);
+      padding: 17px 18px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 10px;
+      cursor: pointer;
+      transition: background .25s var(--ease), color .25s var(--ease);
+    }
+
+    .primary-button {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .primary-button:hover {
+      background: transparent;
+      color: var(--white);
+    }
+
+    .secondary-button {
+      background: transparent;
+      color: var(--white);
+      border-left: 0;
+    }
+
+    .secondary-button:hover {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .hero-stage {
+      position: relative;
+      min-height: 680px;
+      overflow: hidden;
+      background: var(--black);
+    }
+
+    .stage-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent);
+    }
+
+    .stage-light {
+      position: absolute;
+      left: 50%;
+      top: 7%;
+      width: 1px;
+      height: 56%;
+      background: linear-gradient(to bottom, transparent, white 44%, transparent);
+      box-shadow: 0 0 28px white;
+      animation: lightPulse 3.8s ease-in-out infinite;
+    }
+
+    .stage-frame {
+      position: absolute;
+      inset: 8%;
+      border: 1px solid var(--line);
+    }
+
+    .stage-frame::before,
+    .stage-frame::after {
+      content: "";
+      position: absolute;
+      width: 46px;
+      height: 46px;
+      border-color: var(--white);
+    }
+
+    .stage-frame::before {
+      left: -1px;
+      top: -1px;
+      border-left: 1px solid;
+      border-top: 1px solid;
+    }
+
+    .stage-frame::after {
+      right: -1px;
+      bottom: -1px;
+      border-right: 1px solid;
+      border-bottom: 1px solid;
+    }
+
+    .stage-word {
+      position: absolute;
+      left: 50%;
+      bottom: 14%;
+      transform: translateX(-50%);
+      font-size: clamp(60px, 8vw, 128px);
+      font-weight: 800;
+      letter-spacing: -.08em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,.2);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .stage-counter {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      writing-mode: vertical-rl;
+      font-size: 10px;
+      letter-spacing: .24em;
+      color: var(--gray-6);
+    }
+
+    /* SECTIONS */
+    .section {
+      border-bottom: 1px solid var(--line);
+      padding: 54px 34px 70px;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-index {
+      font-size: 10px;
+      color: var(--gray-5);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 66px);
+      line-height: .95;
+      letter-spacing: -.05em;
+      text-transform: uppercase;
+    }
+
+    .section-link {
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gray-6);
+    }
+
+    /* MODELS */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    .model-card {
+      min-height: 420px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--black);
+    }
+
+    .model-visual {
+      position: absolute;
+      inset: 0;
+      opacity: .62;
+      transition: opacity .45s var(--ease), transform .8s var(--ease);
       background:
-        radial-gradient(circle at 15% 20%, rgba(139,92,246,.18), transparent 32%),
-        radial-gradient(circle at 85% 10%, rgba(255,79,163,.15), transparent 30%),
-        var(--bg);
-      color:var(--text);
+        linear-gradient(135deg, rgba(255,255,255,.08), transparent 40%),
+        repeating-linear-gradient(
+          90deg,
+          #050505 0,
+          #050505 24px,
+          #0d0d0d 24px,
+          #0d0d0d 48px
+        );
     }
 
-    button,input{font:inherit}
-    img{display:block;max-width:100%}
-
-    .shell{
-      min-height:100vh;
-      display:grid;
-      grid-template-columns:260px 1fr;
-    }
-
-    aside{
-      border-right:1px solid var(--line);
-      background:rgba(10,10,18,.85);
-      backdrop-filter:blur(16px);
-      padding:28px 20px;
-      position:sticky;
-      top:0;
-      height:100vh;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:34px;
-    }
-
-    .brand-mark{
-      width:44px;height:44px;border-radius:16px;
-      background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
-      display:grid;place-items:center;
-      font-weight:900;
-      box-shadow:0 10px 30px rgba(139,92,246,.35);
-    }
-
-    .brand h1{font-size:18px;margin:0}
-    .brand span{font-size:12px;color:var(--muted)}
-
-    nav{display:grid;gap:8px}
-    nav a{
-      text-decoration:none;
-      color:var(--muted);
-      padding:13px 14px;
-      border-radius:14px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      transition:.2s ease;
-    }
-
-    nav a:hover, nav a.active{
-      color:white;
-      background:linear-gradient(90deg,rgba(79,124,255,.18),rgba(255,79,163,.13));
-      border:1px solid rgba(255,255,255,.06);
-    }
-
-    .credit-box{
-      margin-top:28px;
-      padding:18px;
-      border-radius:20px;
-      background:linear-gradient(145deg,rgba(79,124,255,.16),rgba(255,79,163,.12));
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    .credit-box small{color:var(--muted)}
-    .credit-value{font-size:28px;font-weight:800;margin:5px 0}
-    .credit-box button{
-      width:100%;
-      border:0;
-      padding:11px 14px;
-      border-radius:12px;
-      color:white;
-      font-weight:800;
-      background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink));
-      cursor:pointer;
-    }
-
-    main{padding:28px 34px 60px;min-width:0}
-
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:20px;
-      margin-bottom:28px;
-    }
-
-    .topbar h2{font-size:28px;margin:0}
-    .topbar p{margin:6px 0 0;color:var(--muted)}
-    .profile{
-      display:flex;align-items:center;gap:12px;
-      padding:9px 12px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-
-    .avatar{
-      width:38px;height:38px;border-radius:50%;
-      background:linear-gradient(135deg,var(--pink),var(--purple));
-      display:grid;place-items:center;font-weight:800;
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:22px;
-      align-items:stretch;
-      margin-bottom:30px;
-    }
-
-    .hero-card,.upload-card{
-      border:1px solid var(--line);
-      border-radius:28px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .hero-card{
-      padding:38px;
-      min-height:300px;
+    .model-card:nth-child(2) .model-visual {
       background:
-        linear-gradient(120deg,rgba(79,124,255,.22),rgba(139,92,246,.15),rgba(255,79,163,.17)),
-        #12121d;
-      position:relative;
+        radial-gradient(circle at 50% 34%, rgba(255,255,255,.26), transparent 18%),
+        linear-gradient(110deg, #050505 0 45%, #151515 45% 55%, #020202 55%);
     }
 
-    .hero-card:after{
-      content:"";
-      position:absolute;
-      right:-80px;bottom:-100px;
-      width:280px;height:280px;border-radius:50%;
-      background:linear-gradient(135deg,var(--pink),var(--purple));
-      filter:blur(8px);
-      opacity:.32;
+    .model-card:nth-child(3) .model-visual {
+      background:
+        linear-gradient(160deg, transparent 0 52%, rgba(255,255,255,.12) 52% 54%, transparent 54%),
+        radial-gradient(circle at 62% 32%, rgba(255,255,255,.18), transparent 16%),
+        #050505;
     }
 
-    .badge{
-      display:inline-flex;
-      padding:7px 11px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+    .model-card:nth-child(4) .model-visual {
+      background:
+        linear-gradient(90deg, transparent 0 48%, rgba(255,255,255,.14) 49%, transparent 50%),
+        linear-gradient(180deg, #111 0, #020202 65%);
     }
 
-    .hero-card h3{
-      font-size:42px;
-      line-height:1.05;
-      max-width:640px;
-      margin:20px 0 14px;
+    .model-card:hover .model-visual {
+      opacity: 1;
+      transform: scale(1.035);
     }
 
-    .hero-card p{
-      max-width:620px;
-      color:var(--muted);
-      font-size:17px;
-      line-height:1.6;
+    .model-number {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      font-size: 10px;
+      color: var(--gray-6);
+      letter-spacing: .22em;
     }
 
-    .hero-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
-    .btn{
-      border:0;
-      cursor:pointer;
-      padding:13px 18px;
-      border-radius:14px;
-      font-weight:800;
-    }
-    .btn-primary{
-      color:white;
-      background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink));
-      box-shadow:0 10px 30px rgba(139,92,246,.3);
-    }
-    .btn-secondary{
-      color:white;
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--line);
+    .model-content {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
     }
 
-    .upload-card{
-      background:var(--card);
-      padding:22px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
+    .model-title {
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: -.03em;
     }
 
-    .upload-card h4{margin:0 0 8px;font-size:20px}
-    .upload-card p{margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.5}
-
-    .dropzone{
-      min-height:190px;
-      border:2px dashed rgba(255,255,255,.16);
-      border-radius:20px;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:24px;
-      cursor:pointer;
-      transition:.2s ease;
-      background:rgba(255,255,255,.025);
-    }
-    .dropzone:hover{border-color:var(--pink);background:rgba(255,79,163,.05)}
-    .dropzone strong{display:block;margin-top:10px}
-    .dropzone span{font-size:13px;color:var(--muted)}
-    #photoInput{display:none}
-
-    .section-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:end;
-      margin:34px 0 18px;
-    }
-    .section-head h3{margin:0;font-size:24px}
-    .section-head p{margin:6px 0 0;color:var(--muted)}
-    .section-head a{color:#d8c6ff;text-decoration:none;font-weight:700}
-
-    .gallery{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:18px;
+    .model-meta {
+      margin-top: 8px;
+      color: var(--gray-6);
+      font-size: 9px;
     }
 
-    .model-card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:22px;
-      overflow:hidden;
-      transition:.25s ease;
-      cursor:pointer;
-    }
-    .model-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
-    .model-image{
-      aspect-ratio:4/5;
-      background-size:cover;
-      background-position:center;
-      position:relative;
-    }
-    .model-image:after{
-      content:"";
-      position:absolute;inset:0;
-      background:linear-gradient(to top,rgba(8,8,14,.78),transparent 50%);
-    }
-    .model-info{padding:15px}
-    .model-info strong{display:block}
-    .model-info span{font-size:13px;color:var(--muted)}
-    .model-tag{
-      position:absolute;
-      left:12px;top:12px;
-      z-index:2;
-      background:rgba(12,12,20,.72);
-      backdrop-filter:blur(8px);
-      padding:7px 9px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:800;
+    /* GENERATOR */
+    .generator {
+      display: grid;
+      grid-template-columns: .75fr 1.25fr;
+      border: 1px solid var(--line);
     }
 
-    .steps{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
+    .generator-steps {
+      border-right: 1px solid var(--line);
+      padding: 32px;
     }
 
-    .step{
-      padding:22px;
-      border-radius:20px;
-      background:var(--card);
-      border:1px solid var(--line);
-    }
-    .step-number{
-      width:38px;height:38px;border-radius:12px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
-      font-weight:900;
-      margin-bottom:14px;
-    }
-    .step h4{margin:0 0 8px}
-    .step p{margin:0;color:var(--muted);line-height:1.5}
-
-    .mobile-menu{display:none}
-
-    @media(max-width:1050px){
-      .gallery{grid-template-columns:repeat(2,1fr)}
-      .hero{grid-template-columns:1fr}
+    .step-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
 
-    @media(max-width:760px){
-      .shell{display:block}
-      aside{
-        position:fixed;
-        z-index:20;
-        left:-280px;
-        transition:.25s ease;
-        width:260px;
+    .step-item:last-child {
+      border-bottom: 0;
+    }
+
+    .step-number {
+      font-size: 24px;
+      font-weight: 300;
+    }
+
+    .step-title {
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .step-text {
+      margin-top: 8px;
+      color: var(--gray-5);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .upload-panel {
+      min-height: 470px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .upload-panel::before,
+    .upload-panel::after {
+      content: "";
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      border-color: var(--white);
+      pointer-events: none;
+    }
+
+    .upload-panel::before {
+      top: 18px;
+      left: 18px;
+      border-top: 1px solid;
+      border-left: 1px solid;
+    }
+
+    .upload-panel::after {
+      right: 18px;
+      bottom: 18px;
+      border-right: 1px solid;
+      border-bottom: 1px solid;
+    }
+
+    .upload-label {
+      width: min(560px, calc(100% - 48px));
+      min-height: 260px;
+      border: 1px solid var(--line-strong);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      cursor: pointer;
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-label::after {
+      content: "";
+      position: absolute;
+      left: -100%;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--white);
+      transition: left .5s var(--ease);
+    }
+
+    .upload-label:hover::after {
+      left: 0;
+    }
+
+    .upload-icon {
+      width: 54px;
+      height: 54px;
+      border: 1px solid var(--line-strong);
+      display: grid;
+      place-items: center;
+      margin: 0 auto 22px;
+      font-size: 22px;
+    }
+
+    .upload-title {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .upload-sub {
+      margin-top: 10px;
+      color: var(--gray-5);
+      font-size: 12px;
+    }
+
+    #photoInput {
+      display: none;
+    }
+
+    .file-status {
+      margin-top: 18px;
+      min-height: 16px;
+      color: var(--gray-6);
+      font-size: 10px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    /* GENERATION LOADING */
+    .generation-loader {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: var(--black);
+      z-index: 6;
+      place-items: center;
+      text-align: center;
+    }
+
+    .generation-loader.is-active {
+      display: grid;
+    }
+
+    .scan-frame {
+      width: min(520px, calc(100% - 48px));
+      height: 260px;
+      border: 1px solid var(--line-strong);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--white);
+      box-shadow: 0 0 18px rgba(255,255,255,.8);
+      animation: scan 1.7s linear infinite;
+    }
+
+    .scan-copy {
+      position: absolute;
+      left: 20px;
+      bottom: 18px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--gray-6);
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    .stat {
+      padding: 30px 24px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 300;
+    }
+
+    .stat-label {
+      margin-top: 8px;
+      color: var(--gray-5);
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .footer {
+      min-height: 90px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 34px;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-copy {
+      font-size: 9px;
+      color: var(--gray-5);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      font-size: 9px;
+      color: var(--gray-6);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    /* REVEALS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity .8s var(--ease), transform .8s var(--ease);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ANIMATIONS */
+    @keyframes lightPulse {
+      0%,100% { opacity: .25; transform: scaleY(.72); }
+      50% { opacity: 1; transform: scaleY(1); }
+    }
+
+    @keyframes scan {
+      0% { top: 0; opacity: 0; }
+      12% { opacity: 1; }
+      88% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    @media (max-width: 1120px) {
+      .app {
+        grid-template-columns: 200px minmax(0,1fr);
       }
-      aside.open{left:0}
-      .mobile-menu{
-        display:grid;place-items:center;
-        width:42px;height:42px;border-radius:12px;
-        border:1px solid var(--line);
-        background:var(--card);color:white;
+
+      .hero {
+        grid-template-columns: 1fr;
       }
-      main{padding:18px 16px 40px}
-      .topbar{align-items:flex-start}
-      .profile{display:none}
-      .hero-card{padding:26px;min-height:auto}
-      .hero-card h3{font-size:33px}
-      .gallery{grid-template-columns:1fr 1fr}
-      .steps{grid-template-columns:1fr}
+
+      .hero-copy {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero-stage {
+        min-height: 520px;
+      }
+
+      .models-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
     }
 
-    @media(max-width:520px){
-      .gallery{grid-template-columns:1fr}
-      .topbar h2{font-size:23px}
-      .hero-card h3{font-size:29px}
-      .hero-actions{flex-direction:column}
-      .btn{width:100%}
+    @media (max-width: 760px) {
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: -100%;
+        width: 270px;
+        transition: left .35s var(--ease);
+      }
+
+      .sidebar.is-open {
+        left: 0;
+      }
+
+      .menu-button {
+        display: block;
+      }
+
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .hero-copy {
+        padding: 58px 20px 42px;
+      }
+
+      .hero-title {
+        font-size: clamp(52px, 16vw, 84px);
+      }
+
+      .hero-actions {
+        display: grid;
+      }
+
+      .primary-button,
+      .secondary-button {
+        width: 100%;
+        border-left: 1px solid var(--white);
+      }
+
+      .secondary-button {
+        border-top: 0;
+      }
+
+      .hero-stage {
+        min-height: 420px;
+      }
+
+      .section {
+        padding: 46px 16px 58px;
+      }
+
+      .section-heading {
+        grid-template-columns: 1fr;
+      }
+
+      .section-link {
+        display: none;
+      }
+
+      .models-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .model-card {
+        min-height: 360px;
+      }
+
+      .generator {
+        grid-template-columns: 1fr;
+      }
+
+      .generator-steps {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .stats {
+        grid-template-columns: repeat(2,1fr);
+      }
+
+      .footer {
+        padding: 24px 16px;
+        align-items: flex-start;
+        gap: 20px;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="shell">
-    <aside id="sidebar">
-      <div class="brand">
-        <div class="brand-mark">AI</div>
-        <div>
-          <h1>Studio Aura IA</h1>
-          <span>Ensaios fotográficos</span>
-        </div>
+  <div class="site-loader" id="siteLoader">
+    <div class="loader-inner">
+      <h1 class="loader-brand">STUDIO<br>AURA</h1>
+      <div class="loader-kicker">Fotografia · Inteligência Artificial · Cinema</div>
+
+      <div class="loader-track">
+        <div class="loader-progress" id="loaderProgress"></div>
       </div>
 
-      <nav>
-        <a class="active" href="#inicio">⌂ Início</a>
-        <a href="#modelos">✦ Modelos de ensaio</a>
-        <a href="#como-funciona">◫ Como funciona</a>
-        <a href="#">▣ Minhas gerações</a>
-        <a href="#">⚙ Configurações</a>
+      <div class="loader-row">
+        <span>Carregando experiência</span>
+        <span id="loaderPercent">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-name">Studio Aura</div>
+        <div class="brand-mark">AI / 2026</div>
+      </div>
+
+      <nav class="main-nav">
+        <a class="nav-link active" href="#inicio">Início</a>
+        <a class="nav-link" href="#ensaios">Ensaios</a>
+        <a class="nav-link" href="#gerar">Gerar imagem</a>
+        <a class="nav-link" href="#resultados">Resultados</a>
+        <a class="nav-link" href="#">Perfil</a>
       </nav>
 
-      <div class="credit-box">
-        <small>Seus créditos</small>
-        <div class="credit-value">20 créditos</div>
-        <small>2 imagens disponíveis</small>
-        <button type="button">Comprar créditos</button>
+      <div class="credits">
+        <div class="credit-label">Créditos disponíveis</div>
+        <div class="credit-value">120</div>
+        <p class="credit-sub">12 gerações disponíveis</p>
+        <button class="line-button" type="button">Comprar créditos</button>
       </div>
     </aside>
 
-    <main>
+    <main class="main">
       <header class="topbar">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <button class="mobile-menu" id="menuButton">☰</button>
-          <div>
-            <h2>Crie seu ensaio com IA</h2>
-            <p>Escolha um estilo, envie sua foto e gere uma nova imagem.</p>
-          </div>
-        </div>
-        <div class="profile">
-          <div class="avatar">GC</div>
-          <div>
-            <strong>Minha conta</strong>
-            <div style="font-size:12px;color:var(--muted)">Plano inicial</div>
-          </div>
-        </div>
+        <button class="menu-button" id="menuButton" aria-label="Abrir menu">
+          <span></span>
+        </button>
+        <div class="topbar-left">Plataforma de ensaios fotográficos com IA</div>
+        <div class="topbar-left">Manaus · Brasil</div>
       </header>
 
       <section class="hero" id="inicio">
-        <div class="hero-card">
-          <span class="badge">Experiência premium</span>
-          <h3>Seu próximo ensaio começa com uma única foto.</h3>
-          <p>Escolha uma inspiração, envie uma foto nítida do rosto e deixe a inteligência artificial recriar a cena mantendo sua identidade visual.</p>
-          <div class="hero-actions">
-            <button class="btn btn-primary" onclick="document.getElementById('modelos').scrollIntoView()">Escolher um modelo</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('como-funciona').scrollIntoView()">Ver como funciona</button>
+        <div class="hero-copy">
+          <div class="eyebrow reveal">Nova geração de fotografia</div>
+
+          <h2 class="hero-title reveal">
+            Transforme<br>
+            sua imagem<br>
+            em cinema
+          </h2>
+
+          <p class="hero-description reveal">
+            Crie ensaios fotográficos profissionais com inteligência artificial.
+            Escolha o estilo, envie sua foto e receba imagens com direção artística,
+            iluminação e acabamento cinematográfico.
+          </p>
+
+          <div class="hero-actions reveal">
+            <button
+              class="primary-button"
+              type="button"
+              onclick="document.getElementById('ensaios').scrollIntoView()"
+            >
+              Escolher ensaio
+            </button>
+
+            <button
+              class="secondary-button"
+              type="button"
+              onclick="document.getElementById('gerar').scrollIntoView()"
+            >
+              Enviar foto
+            </button>
           </div>
         </div>
 
-        <div class="upload-card">
-          <div>
-            <h4>Envie sua foto</h4>
-            <p>Use uma imagem frontal, bem iluminada e sem filtros pesados.</p>
-          </div>
-          <label class="dropzone" for="photoInput">
-            <div>
-              <div style="font-size:38px">↥</div>
-              <strong id="uploadTitle">Clique para escolher sua foto</strong>
-              <span id="uploadHint">JPG ou PNG • máximo de 10 MB</span>
-            </div>
-          </label>
-          <input id="photoInput" type="file" accept="image/*" />
-        </div>
-      </section>
-
-      <section id="modelos">
-        <div class="section-head">
-          <div>
-            <h3>Modelos de ensaio</h3>
-            <p>Escolha o estilo que mais combina com você.</p>
-          </div>
-          <a href="#">Ver todos</a>
-        </div>
-
-        <div class="gallery">
-          <article class="model-card">
-            <div class="model-image" style="background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85')">
-              <span class="model-tag">Mais escolhido</span>
-            </div>
-            <div class="model-info"><strong>Retrato Elegante</strong><span>Estúdio • iluminação suave</span></div>
-          </article>
-
-          <article class="model-card">
-            <div class="model-image" style="background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=85')">
-              <span class="model-tag">Profissional</span>
-            </div>
-            <div class="model-info"><strong>Executivo Premium</strong><span>Corporativo • imagem de autoridade</span></div>
-          </article>
-
-          <article class="model-card">
-            <div class="model-image" style="background-image:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85')">
-              <span class="model-tag">Delicado</span>
-            </div>
-            <div class="model-info"><strong>Editorial Rosa</strong><span>Feminino • sofisticado</span></div>
-          </article>
-
-          <article class="model-card">
-            <div class="model-image" style="background-image:url('https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&w=900&q=85')">
-              <span class="model-tag">Novo</span>
-            </div>
-            <div class="model-info"><strong>Luxo Noturno</strong><span>Cinematográfico • alto contraste</span></div>
-          </article>
+        <div class="hero-stage">
+          <div class="stage-grid"></div>
+          <div class="stage-light"></div>
+          <div class="stage-frame"></div>
+          <div class="stage-word">AURA</div>
+          <div class="stage-counter">FRAME 001 / AI PORTRAIT</div>
         </div>
       </section>
 
-      <section id="como-funciona">
-        <div class="section-head">
-          <div>
-            <h3>Como funciona</h3>
-            <p>Uma experiência simples, rápida e preparada para o seu futuro sistema de créditos.</p>
-          </div>
+      <section class="section" id="ensaios">
+        <div class="section-heading reveal">
+          <div class="section-index">01 / Ensaios</div>
+          <h3 class="section-title">Escolha sua direção artística</h3>
+          <a class="section-link" href="#">Ver todos →</a>
         </div>
 
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h4>Escolha uma inspiração</h4>
-            <p>Selecione o cenário, a roupa e o estilo de ensaio que deseja recriar.</p>
+        <div class="models-grid reveal">
+          <article class="model-card">
+            <div class="model-visual"></div>
+            <div class="model-number">01</div>
+            <div class="model-content">
+              <div class="model-title">Editorial</div>
+              <div class="model-meta">Moda · Contraste · Estúdio</div>
+            </div>
+          </article>
+
+          <article class="model-card">
+            <div class="model-visual"></div>
+            <div class="model-number">02</div>
+            <div class="model-content">
+              <div class="model-title">Executivo</div>
+              <div class="model-meta">Autoridade · Elegância · Retrato</div>
+            </div>
+          </article>
+
+          <article class="model-card">
+            <div class="model-visual"></div>
+            <div class="model-number">03</div>
+            <div class="model-content">
+              <div class="model-title">Noir</div>
+              <div class="model-meta">Cinema · Sombras · Mistério</div>
+            </div>
+          </article>
+
+          <article class="model-card">
+            <div class="model-visual"></div>
+            <div class="model-number">04</div>
+            <div class="model-content">
+              <div class="model-title">Clássico</div>
+              <div class="model-meta">Preto e branco · Atemporal</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="gerar">
+        <div class="section-heading reveal">
+          <div class="section-index">02 / Criação</div>
+          <h3 class="section-title">Comece sua geração</h3>
+          <div class="section-link">10 créditos por imagem</div>
+        </div>
+
+        <div class="generator reveal">
+          <div class="generator-steps">
+            <div class="step-item">
+              <div class="step-number">01</div>
+              <div>
+                <div class="step-title">Escolha o ensaio</div>
+                <div class="step-text">Selecione a estética e a direção visual desejadas.</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">02</div>
+              <div>
+                <div class="step-title">Envie sua foto</div>
+                <div class="step-text">Utilize uma imagem nítida, frontal e bem iluminada.</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">03</div>
+              <div>
+                <div class="step-title">Geração com IA</div>
+                <div class="step-text">A plataforma recria sua imagem com qualidade profissional.</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">04</div>
+              <div>
+                <div class="step-title">Receba o resultado</div>
+                <div class="step-text">Visualize, salve e faça novas variações.</div>
+              </div>
+            </div>
           </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h4>Envie sua foto</h4>
-            <p>Faça o upload de uma imagem nítida para preservar melhor seus traços.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h4>Gere sua imagem</h4>
-            <p>Cada geração utilizará 10 créditos quando conectarmos a API e o Supabase.</p>
+
+          <div class="upload-panel">
+            <label class="upload-label" for="photoInput">
+              <div>
+                <div class="upload-icon">↑</div>
+                <div class="upload-title" id="uploadTitle">Arraste sua foto aqui</div>
+                <div class="upload-sub">ou clique para selecionar · JPG, PNG ou WEBP</div>
+                <div class="file-status" id="fileStatus"></div>
+              </div>
+            </label>
+
+            <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" />
+
+            <div class="generation-loader" id="generationLoader">
+              <div class="scan-frame">
+                <div class="scan-line"></div>
+                <div class="scan-copy">
+                  <span>Analisando imagem</span>
+                  <span id="generationPercent">0%</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      <section class="section" id="resultados">
+        <div class="section-heading reveal">
+          <div class="section-index">03 / Números</div>
+          <h3 class="section-title">Experiência de alto nível</h3>
+          <div></div>
+        </div>
+
+        <div class="stats reveal">
+          <div class="stat">
+            <div class="stat-value">+25K</div>
+            <div class="stat-label">Ensaios criados</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">98%</div>
+            <div class="stat-label">Satisfação</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">50+</div>
+            <div class="stat-label">Estilos disponíveis</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Plataforma online</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-copy">© 2026 Studio Aura. Todos os direitos reservados.</div>
+        <div class="footer-links">
+          <a href="#">Termos</a>
+          <a href="#">Privacidade</a>
+        </div>
+      </footer>
     </main>
   </div>
 
   <script>
-    const input = document.getElementById('photoInput');
-    const title = document.getElementById('uploadTitle');
-    const hint = document.getElementById('uploadHint');
-    const menuButton = document.getElementById('menuButton');
-    const sidebar = document.getElementById('sidebar');
+    const siteLoader = document.getElementById("siteLoader");
+    const loaderProgress = document.getElementById("loaderProgress");
+    const loaderPercent = document.getElementById("loaderPercent");
+    const app = document.getElementById("app");
 
-    input.addEventListener('change', () => {
-      const file = input.files[0];
+    let siteProgress = 0;
+
+    const siteLoadingInterval = setInterval(() => {
+      siteProgress += Math.floor(Math.random() * 9) + 3;
+
+      if (siteProgress >= 100) {
+        siteProgress = 100;
+        clearInterval(siteLoadingInterval);
+
+        setTimeout(() => {
+          siteLoader.classList.add("is-hidden");
+          app.classList.add("is-visible");
+          revealVisibleElements();
+        }, 350);
+      }
+
+      loaderProgress.style.width = siteProgress + "%";
+      loaderPercent.textContent = siteProgress + "%";
+    }, 90);
+
+    const sidebar = document.getElementById("sidebar");
+    const menuButton = document.getElementById("menuButton");
+
+    menuButton.addEventListener("click", () => {
+      sidebar.classList.toggle("is-open");
+    });
+
+    document.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", () => {
+        document.querySelectorAll(".nav-link").forEach(item => item.classList.remove("active"));
+        link.classList.add("active");
+        sidebar.classList.remove("is-open");
+      });
+    });
+
+    const input = document.getElementById("photoInput");
+    const uploadTitle = document.getElementById("uploadTitle");
+    const fileStatus = document.getElementById("fileStatus");
+    const generationLoader = document.getElementById("generationLoader");
+    const generationPercent = document.getElementById("generationPercent");
+
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
       if (!file) return;
-      title.textContent = file.name;
-      hint.textContent = 'Foto selecionada com sucesso';
+
+      uploadTitle.textContent = file.name;
+      fileStatus.textContent = "Arquivo selecionado com sucesso";
+
+      generationLoader.classList.add("is-active");
+
+      let generationProgress = 0;
+      generationPercent.textContent = "0%";
+
+      const generationInterval = setInterval(() => {
+        generationProgress += Math.floor(Math.random() * 8) + 2;
+
+        if (generationProgress >= 100) {
+          generationProgress = 100;
+          clearInterval(generationInterval);
+
+          setTimeout(() => {
+            generationLoader.classList.remove("is-active");
+            fileStatus.textContent = "Imagem pronta para geração";
+          }, 500);
+        }
+
+        generationPercent.textContent = generationProgress + "%";
+      }, 120);
     });
 
-    menuButton.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
+    const revealElements = document.querySelectorAll(".reveal");
 
-    document.querySelectorAll('.model-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.model-card').forEach(item => item.style.outline = 'none');
-        card.style.outline = '2px solid #ff4fa3';
-        card.style.outlineOffset = '3px';
+    const revealObserver = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    revealElements.forEach(element => revealObserver.observe(element));
+
+    function revealVisibleElements() {
+      revealElements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.9) {
+          element.classList.add("is-visible");
+        }
+      });
+    }
+
+    document.querySelectorAll(".model-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".model-card").forEach(item => {
+          item.style.outline = "none";
+        });
+
+        card.style.outline = "1px solid #fff";
+        card.style.outlineOffset = "-1px";
       });
     });
   </script>
